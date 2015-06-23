@@ -33639,7 +33639,7 @@ module.exports = React.createClass({
 		}
 
 		if (_.isEmpty(errors)) {
-			user.save();
+			//user.save();
 			this.props.routing.navigate("profile", { trigger: true });
 		} else {
 			this.setState({ errors: errors });
