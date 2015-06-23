@@ -10,7 +10,6 @@ module.exports = React.createClass({
 		};
 	},
 	render: function(){
-		console.log(this.state.errors);
 		return (
 			<div>
 				<div className="well add-border center-block text-center container small">
@@ -29,12 +28,13 @@ module.exports = React.createClass({
 						<div className="form-group">
 							<label className="col-sm-12 control-label">Password</label>
 							<input placeholder="hunter2" ref="newPassword" className="form-control" type="password"/>
+							<span className="errors">{this.state.errors.password}</span><br/>
 							<span className="errors">{this.state.errors.passwordLength}</span><br/>
 						</div><br/>
 						<div className="form-group">
 							<label className="col-sm-12 control-label">Confirm Password</label>
 							<input placeholder="hunter2" ref="confirmPassword" className="form-control" input type="password"/>
-							<span className="errors">{this.state.errors.password}</span><br/>
+							<span className="errors">{this.state.errors.confirmPassword}</span><br/>
 						</div><br/>
 							<button className="btn btn-primary">Sign Up</button>
 					</form>
@@ -57,8 +57,18 @@ module.exports = React.createClass({
 		});
 
 		if(!user.get("username") || !user.get("password") || !user.get("email") || !confirm){
-			console.log("do i get called?");
-			errors.blank = "*You must not leave fields blank";	
+			if(!user.get("username")){
+				errors.username = "*You must not leave this field blank";
+			}
+			if(!user.get("email")){
+				errors.email = "*You must not leave this field blank";
+			}
+			if(!user.get("password")){
+				errors.password = "*You must not leave this field blank";
+			}
+			if(!confirm){
+				errors.confirmPassword = "*You must not leave this field blank";
+			}		
 		} else {
 			if(!validator.isEmail(user.get("email"))){
 				errors.email = "*Must be a valid email";
@@ -67,15 +77,32 @@ module.exports = React.createClass({
 				errors.username = "*Username must only contain numbers and letters";
 			}
 			if(confirm !== user.get("password")){
-				errors.password = "*Passwords do not match";
+				errors.confirmPassword = "*Passwords do not match";
 			} else if(user.get("password").length <= 3){
 				errors.passwordLength = "*Password must much longer than 3 characters";
 			}
 		}
 
 		if(_.isEmpty(errors)){
-			//user.save();
-			this.props.routing.navigate("profile", {trigger:true});
+			var that = this;
+			user.save(null,
+				{error: function(data,error) {
+					switch(error.responseJSON.code){
+						case 202:
+						errors.username = "*Username is taken";
+						that.setState({errors: errors});
+						break;
+						case 203:
+						errors.email = "*Email is already being used";
+						that.setState({errors: errors});
+						break;
+					}
+				},
+				success: function(){
+					that.props.routing.navigate("profile", {trigger: true});
+				}
+			});
+			
 		} else {
 			this.setState({errors: errors});
 		}
