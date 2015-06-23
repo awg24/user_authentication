@@ -12,7 +12,8 @@ var App = Backbone.Router.extend({
 	routes: {
 		"":"login",
 		"login": "login",
-		"register":"register"
+		"register":"register",
+		"profile": "profile"
 	},
 	login: function(){
 		React.render(
@@ -26,11 +27,14 @@ var App = Backbone.Router.extend({
 	register: function(){
 		React.render(
 			<div>
-				<NavBar />
-				<Register />
+				<NavBar/>
+				<Register routing={myRoutes} />
 			</div>
 			, containerEl
 		);
+	},
+	profile: function(){
+		React.render(<div>Im a profile!</div>, containerEl);
 	}
 });
 
