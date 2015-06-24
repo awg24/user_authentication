@@ -33485,7 +33485,7 @@ module.exports = Backbone.Collection.extend({
     parseClassName: '_User'
 });
 
-},{"../models/UserModel":168,"backparse":3,"jquery":5}],163:[function(require,module,exports){
+},{"../models/UserModel":170,"backparse":3,"jquery":5}],163:[function(require,module,exports){
 "use strict";
 
 var React = require("react");
@@ -33550,7 +33550,6 @@ module.exports = React.createClass({
 		event.preventDefault();
 		var that = this;
 		var errors = {};
-		var user = new UserModel();
 
 		var username = this.refs.username.getDOMNode().value;
 		var password = this.refs.password.getDOMNode().value;
@@ -33558,7 +33557,7 @@ module.exports = React.createClass({
 			errors.username = "*Cannot login with blank fields";
 			this.setState({ errors: errors });
 		} else {
-			user.login({
+			this.props.user.login({
 				username: username,
 				password: password
 			}, {
@@ -33575,49 +33574,74 @@ module.exports = React.createClass({
 	}
 });
 
-},{"../models/UserModel":168,"react":160}],164:[function(require,module,exports){
-"use strict";
+},{"../models/UserModel":170,"react":160}],164:[function(require,module,exports){
+'use strict';
 
-var React = require("react");
+var React = require('react');
 
 module.exports = React.createClass({
-	displayName: "exports",
+	displayName: 'exports',
 
+	componentWillMount: function componentWillMount() {
+		this.props.user.on('change', function () {
+			console.log('user changed nav');
+			console.log(this);
+			this.forceUpdate();
+		}, this);
+	},
 	render: function render() {
-		return React.createElement(
-			"nav",
-			{ className: "navbar add-border navbar-default" },
-			React.createElement(
-				"div",
-				{ className: "container-fluid" },
+		var link = [];
+		console.log(this.props.user);
+		if (this.props.user.id) {
+			link.push(React.createElement(
+				'li',
+				{ key: 3 },
 				React.createElement(
-					"div",
-					{ className: "collapse navbar-collapse", id: "bs-example-navbar-collapse-1" },
+					'a',
+					{ onClick: this.logOut, href: '#login' },
+					'Logout'
+				)
+			));
+		} else {
+			link.push(React.createElement(
+				'li',
+				{ key: 1 },
+				React.createElement(
+					'a',
+					{ href: '#login' },
+					'Login'
+				)
+			));
+			link.push(React.createElement(
+				'li',
+				{ key: 2 },
+				React.createElement(
+					'a',
+					{ href: '#register' },
+					'Resgister'
+				)
+			));
+		}
+		return React.createElement(
+			'nav',
+			{ className: 'navbar add-border navbar-default' },
+			React.createElement(
+				'div',
+				{ className: 'container-fluid' },
+				React.createElement(
+					'div',
+					{ className: 'collapse navbar-collapse', id: 'bs-example-navbar-collapse-1' },
 					React.createElement(
-						"ul",
-						{ className: "nav navbar-nav" },
-						React.createElement(
-							"li",
-							null,
-							React.createElement(
-								"a",
-								{ href: "#login" },
-								"Login"
-							)
-						),
-						React.createElement(
-							"li",
-							null,
-							React.createElement(
-								"a",
-								{ href: "#register" },
-								"Resgister"
-							)
-						)
+						'ul',
+						{ className: 'nav navbar-nav' },
+						link
 					)
 				)
 			)
 		);
+	},
+	logOut: function logOut() {
+		this.props.user.clear();
 	}
 });
 
@@ -33625,25 +33649,90 @@ module.exports = React.createClass({
 "use strict";
 
 var React = require("react");
+var _ = require("backbone/node_modules/underscore");
+var Backbone = require("backbone");
+var ThreadModel = require("../models/ThreadModel");
 
 module.exports = React.createClass({
 	displayName: "exports",
 
+	getInitialState: function getInitialState() {
+		return {
+			errors: {}
+		};
+	},
 	render: function render() {
 		return React.createElement(
 			"div",
 			null,
 			React.createElement(
-				"h2",
-				null,
-				this.props.userLoggedIn,
-				" 's Profile"
+				"form",
+				{ onSubmit: this.postThread },
+				React.createElement(
+					"h2",
+					null,
+					"Post a new thread, ",
+					this.props.userLoggedIn,
+					"!"
+				),
+				"Title:",
+				React.createElement("input", { ref: "threadTitle", type: "text" }),
+				React.createElement(
+					"span",
+					{ className: "errors" },
+					this.state.errors.title
+				),
+				React.createElement("br", null),
+				"Body:",
+				React.createElement("textarea", { ref: "body" }),
+				React.createElement(
+					"span",
+					{ className: "errors" },
+					this.state.errors.body
+				),
+				React.createElement("br", null),
+				React.createElement(
+					"button",
+					{ type: "submit" },
+					"Post"
+				)
 			)
 		);
+	},
+	postThread: function postThread(event) {
+		event.preventDefault();
+		var that = this;
+		var errors = {};
+		var threadModel = new ThreadModel({
+			title: this.refs.threadTitle.getDOMNode().value,
+			body: this.refs.body.getDOMNode().value
+		});
+
+		if (!threadModel.get("title")) {
+			errors.title = "Title missing!";
+		}
+		if (!threadModel.get("body")) {
+			errors.body = "Body missing!";
+		}
+
+		if (_.isEmpty(errors)) {
+			threadModel.save(null, {
+				success: function success(data) {
+					console.log(data);
+					that.props.routing.navigate("thread/" + data.id, { trigger: true });
+				},
+				error: function error() {
+					console.log("not that you dont know.. but it didnt work");
+				}
+			});
+			console.log("Im gonna save!");
+		} else {
+			this.setState({ errors: errors });
+		}
 	}
 });
 
-},{"react":160}],166:[function(require,module,exports){
+},{"../models/ThreadModel":169,"backbone":1,"backbone/node_modules/underscore":2,"react":160}],166:[function(require,module,exports){
 "use strict";
 
 var React = require("react");
@@ -33821,7 +33910,51 @@ module.exports = React.createClass({
 	}
 });
 
-},{"../collections/UserCollection":162,"../models/UserModel.js":168,"backbone/node_modules/underscore":2,"react":160,"validator":161}],167:[function(require,module,exports){
+},{"../collections/UserCollection":162,"../models/UserModel.js":170,"backbone/node_modules/underscore":2,"react":160,"validator":161}],167:[function(require,module,exports){
+"use strict";
+
+var React = require("react");
+var ThreadModel = require("../models/ThreadModel");
+
+module.exports = React.createClass({
+	displayName: "exports",
+
+	getInitialState: function getInitialState() {
+		var that = this;
+		var thread = new ThreadModel({
+			objectId: this.props.threadId
+		});
+
+		thread.fetch();
+
+		thread.on("change", function (data) {
+			console.log(data);
+			that.forceUpdate();
+		});
+
+		return {
+			post: thread
+		};
+	},
+	render: function render() {
+		return React.createElement(
+			"div",
+			null,
+			React.createElement(
+				"h1",
+				null,
+				this.state.post.get("title")
+			),
+			React.createElement(
+				"div",
+				null,
+				this.state.post.get("body")
+			)
+		);
+	}
+});
+
+},{"../models/ThreadModel":169,"react":160}],168:[function(require,module,exports){
 "use strict";
 
 var React = require("react");
@@ -33831,15 +33964,22 @@ var Backbone = require("backparse")({
 	apiVersion: 1
 });
 
-var UserCollection = require("./collections/UserCollection");
-var userCollection = new UserCollection();
+// var UserCollection = require("./collections/UserCollection");
+// var userCollection = new UserCollection();
+var UserModel = require("./models/UserModel");
 
 var LoginIn = require("./components/LoginFormComponent");
 var Register = require("./components/RegisterComponent");
 var NavBar = require("./components/NavBarComponent");
 var ProfilePage = require("./components/ProfilePageComponent");
+var ThreadPage = require("./components/ThreadPostComponent");
 
 var containerEl = document.getElementById("container");
+var NavEl = document.getElementById("navigation-element");
+
+var user = new UserModel();
+
+React.render(React.createElement(NavBar, { user: user }), NavEl);
 
 var App = Backbone.Router.extend({
 	routes: {
@@ -33847,46 +33987,64 @@ var App = Backbone.Router.extend({
 		"login": "login",
 		"register": "register",
 		"profile": "login",
-		"profile/:user": "profile"
+		"profile/:user": "profile",
+		"thread/:threadID": "thread"
 	},
 	login: function login() {
 		React.render(React.createElement(
 			"div",
 			null,
-			React.createElement(NavBar, null),
-			React.createElement(LoginIn, { routing: myRoutes })
+			React.createElement(LoginIn, { user: user, routing: myRoutes })
 		), containerEl);
 	},
 	register: function register() {
 		React.render(React.createElement(
 			"div",
 			null,
-			React.createElement(NavBar, null),
-			React.createElement(Register, { routing: myRoutes })
+			React.createElement(Register, { user: user, routing: myRoutes })
 		), containerEl);
 	},
-	profile: function profile(user) {
-		console.log(userCollection);
-		//var loggedInUser = userCollection.findWhere({username: user});
-		//console.log(loggedInUser);
-		// if(loggedInUser){
-		React.render(React.createElement(ProfilePage, { routing: myRoutes, userLoggedIn: user }), containerEl);
-		// } else {
-		// 	React.render(
-		// 		<div>
-		// 			<NavBar />
-		// 			<LoginIn routing={myRoutes} />
-		// 		</div>
-		// 		, containerEl
-		// 	);
-		// }
+	profile: function profile(user1) {
+		React.render(React.createElement(
+			"div",
+			null,
+			React.createElement(ProfilePage, { user: user, routing: myRoutes, userLoggedIn: user1 })
+		), containerEl);
+	},
+	thread: function thread(threadID) {
+		React.render(React.createElement(
+			"div",
+			null,
+			React.createElement(ThreadPage, { user: user, threadId: threadID, routing: myRoutes })
+		), containerEl);
 	}
 });
 
 var myRoutes = new App();
 Backbone.history.start();
 
-},{"./collections/UserCollection":162,"./components/LoginFormComponent":163,"./components/NavBarComponent":164,"./components/ProfilePageComponent":165,"./components/RegisterComponent":166,"backparse":3,"react":160}],168:[function(require,module,exports){
+},{"./components/LoginFormComponent":163,"./components/NavBarComponent":164,"./components/ProfilePageComponent":165,"./components/RegisterComponent":166,"./components/ThreadPostComponent":167,"./models/UserModel":170,"backparse":3,"react":160}],169:[function(require,module,exports){
+"use strict";
+
+var React = require("react");
+var Backbone = require("backparse")({
+				appId: "JzJoSsUj4fip0vDgKJSfmSa1aUoDm5JGaTbhHgUD",
+				apiKey: "msnXS15rnVRaH0syEN1ej94ce4YzWM96cFirnafy",
+				apiVersion: 1
+});
+Backbone.$ = require("jquery");
+var validator = require("validator");
+
+module.exports = Backbone.Model.extend({
+				defaults: {
+								title: null,
+								body: null
+				},
+				parseClassName: "Thread",
+				idAttribute: "objectId"
+});
+
+},{"backparse":3,"jquery":5,"react":160,"validator":161}],170:[function(require,module,exports){
 "use strict";
 
 var React = require("react");
@@ -33909,7 +34067,7 @@ module.exports = Backbone.Model.extend({
 	isUser: true
 });
 
-},{"backparse":3,"jquery":5,"react":160,"validator":161}]},{},[167])
+},{"backparse":3,"jquery":5,"react":160,"validator":161}]},{},[168])
 
 
 //# sourceMappingURL=all.js.map

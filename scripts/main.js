@@ -5,15 +5,22 @@ var Backbone = require("backparse")({
     apiVersion: 1
 });
 
-var UserCollection = require("./collections/UserCollection");
-var userCollection = new UserCollection();
+// var UserCollection = require("./collections/UserCollection");
+// var userCollection = new UserCollection();
+var UserModel = require("./models/UserModel");
 
 var LoginIn = require("./components/LoginFormComponent");
 var Register = require("./components/RegisterComponent");
 var NavBar = require("./components/NavBarComponent");
 var ProfilePage = require("./components/ProfilePageComponent");
+var ThreadPage = require("./components/ThreadPostComponent");
 
 var containerEl = document.getElementById("container");
+var NavEl = document.getElementById("navigation-element");
+
+var user = new UserModel();
+
+React.render(<NavBar user={user}/>, NavEl);
 
 var App = Backbone.Router.extend({
 	routes: {
@@ -21,13 +28,13 @@ var App = Backbone.Router.extend({
 		"login": "login",
 		"register":"register",
 		"profile": "login",
-		"profile/:user": "profile"
+		"profile/:user": "profile",
+		"thread/:threadID": "thread"
 	},
 	login: function(){
 		React.render(
 			<div>
-				<NavBar />
-				<LoginIn routing={myRoutes} />
+				<LoginIn user={user} routing={myRoutes} />
 			</div>
 			, containerEl
 		);
@@ -35,30 +42,31 @@ var App = Backbone.Router.extend({
 	register: function(){
 		React.render(
 			<div>
-				<NavBar/>
-				<Register routing={myRoutes} />
+				<Register user={user} routing={myRoutes} />
 			</div>
 			, containerEl
 		);
 	},
-	profile: function(user){
-		console.log(userCollection);
-		//var loggedInUser = userCollection.findWhere({username: user});
-		//console.log(loggedInUser);
-		// if(loggedInUser){
-			React.render(<ProfilePage routing={myRoutes} userLoggedIn={user}/>, containerEl);
-		// } else {
-		// 	React.render(
-		// 		<div>
-		// 			<NavBar />
-		// 			<LoginIn routing={myRoutes} />
-		// 		</div>
-		// 		, containerEl
-		// 	);
-		// }
-
+	profile: function(user1){
+		React.render(
+			<div>
+				<ProfilePage user={user} routing={myRoutes} userLoggedIn={user1}/>
+			</div>
+			, containerEl);
+	},
+	thread: function(threadID){
+		React.render(
+			<div>
+				<ThreadPage user={user} threadId={threadID} routing={myRoutes}/>
+			</div>
+			, containerEl);
 	}
 });
 
 var myRoutes = new App();
 Backbone.history.start();
+
+
+
+
+

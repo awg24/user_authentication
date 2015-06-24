@@ -31,7 +31,6 @@ module.exports = React.createClass({
 		event.preventDefault();
 		var that = this;
 		var errors = {};
-		var user = new UserModel();
 
 		var username = this.refs.username.getDOMNode().value;
 		var password = this.refs.password.getDOMNode().value
@@ -39,7 +38,7 @@ module.exports = React.createClass({
 			 errors.username = "*Cannot login with blank fields";
 			 this.setState({errors: errors})
 		} else {
-			user.login({
+			this.props.user.login({
 			    username: username,
 			    password: password
 			}, {
