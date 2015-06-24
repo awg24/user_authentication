@@ -17,7 +17,7 @@ module.exports = React.createClass({
 				<div className="well add-border center-block text-center container small">
 					<form className="form-horizatonal" onSubmit={this.createNewUser}>
 						<div className="form-group">
-							<label htmlFor="inputEmail3" className="col-sm-12 control-label">Email</label> 
+							<label htmlFor="inputEmail3" className="col-sm-12 control-label">Email</label>
 							<input placeholder="Example@example.com" ref="newEmail" className="form-control" type="text"/>
 							<span className="errors">{this.state.errors.email}</span><br/>
 						</div><br/>
@@ -69,7 +69,7 @@ module.exports = React.createClass({
 			}
 			if(!confirm){
 				errors.confirmPassword = "*You must not leave this field blank";
-			}		
+			}
 		} else {
 			if(!validator.isEmail(user.get("email"))){
 				errors.email = "*Must be a valid email";
@@ -105,7 +105,7 @@ module.exports = React.createClass({
 					that.props.routing.navigate("profile/"+user.get("username"), {trigger: true});
 				}
 			});
-			
+
 		} else {
 			this.setState({errors: errors});
 		}

@@ -5,7 +5,6 @@ var Backbone = require("backparse")({
     apiVersion: 1
 });
 
-
 var UserCollection = require("./collections/UserCollection");
 var userCollection = new UserCollection();
 
@@ -57,7 +56,7 @@ var App = Backbone.Router.extend({
 		// 		, containerEl
 		// 	);
 		// }
-		
+
 	}
 });
 
