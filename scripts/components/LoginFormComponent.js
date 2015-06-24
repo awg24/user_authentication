@@ -2,6 +2,11 @@ var React = require("react");
 var UserModel = require("../models/UserModel");
 
 module.exports = React.createClass({
+	getInitialState: function(){
+		return {
+			errors: {}
+		};
+	},
 	render: function(){
 		return (
 			<div>
@@ -9,11 +14,12 @@ module.exports = React.createClass({
 					<form className="form-horizatonal" onSubmit={this.validateExistingUser}>
 						<div className="form-group">
 							<label htmlFor="inputEmail3" className="col-sm-12 control-label">Username</label>
-							<input placeholder="Your Username" ref="newUsername" className="form-control" type="text"/>
+							<input placeholder="Your Username" ref="username" className="form-control" type="text"/>
 						</div><br/>
 						<div className="form-group">
 							<label htmlFor="inputEmail3" className="col-sm-12 control-label">Password</label>
-							<input placeholder="Your Password" ref="newPassword" className="form-control" type="password"/>
+							<input placeholder="Your Password" ref="password" className="form-control" type="password"/>
+							<span className="errors">{this.state.errors.username}</span><br/>
 						</div><br/>
 							<button className="btn btn-primary">Login</button>
 					</form>
@@ -23,6 +29,29 @@ module.exports = React.createClass({
 	},
 	validateExistingUser: function(event){
 		event.preventDefault();
-		console.log("yeah, he cool")
-	}
+		var that = this;
+		var errors = {};
+		var user = new UserModel();
+
+		var username = this.refs.username.getDOMNode().value;
+		var password = this.refs.password.getDOMNode().value
+		if(!username || !password){
+			 errors.username = "*Cannot login with blank fields";
+			 this.setState({errors: errors})
+		} else {
+			user.login({
+			    username: username,
+			    password: password
+			}, {
+			    success: function(userModel) {
+			        console.log('user was logged in');
+			        that.props.routing.navigate("profile/"+username, {trigger: true});
+			    },
+			    error: function(userModel, response) {
+			        errors.username = "*Username or password is incorrect";
+			        that.setState({errors: errors})
+			    }
+			})
+				}
+		}
 });

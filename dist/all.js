@@ -33396,6 +33396,22 @@ module.exports = require('./lib/React');
 });
 
 },{}],162:[function(require,module,exports){
+'use strict';
+
+var Backbone = require('backparse')({
+    appId: 'appidgoeshere',
+    apiKey: 'parserestapikeygoeshere',
+    apiVersion: 1
+});
+Backbone.$ = require('jquery');
+var UserModel = require('../models/UserModel');
+
+module.exports = Backbone.Collection.extend({
+    model: UserModel,
+    parseClassName: '_User'
+});
+
+},{"../models/UserModel":168,"backparse":3,"jquery":5}],163:[function(require,module,exports){
 "use strict";
 
 var React = require("react");
@@ -33404,6 +33420,11 @@ var UserModel = require("../models/UserModel");
 module.exports = React.createClass({
 	displayName: "exports",
 
+	getInitialState: function getInitialState() {
+		return {
+			errors: {}
+		};
+	},
 	render: function render() {
 		return React.createElement(
 			"div",
@@ -33422,7 +33443,7 @@ module.exports = React.createClass({
 							{ htmlFor: "inputEmail3", className: "col-sm-12 control-label" },
 							"Username"
 						),
-						React.createElement("input", { placeholder: "Your Username", ref: "newUsername", className: "form-control", type: "text" })
+						React.createElement("input", { placeholder: "Your Username", ref: "username", className: "form-control", type: "text" })
 					),
 					React.createElement("br", null),
 					React.createElement(
@@ -33433,7 +33454,13 @@ module.exports = React.createClass({
 							{ htmlFor: "inputEmail3", className: "col-sm-12 control-label" },
 							"Password"
 						),
-						React.createElement("input", { placeholder: "Your Password", ref: "newPassword", className: "form-control", type: "password" })
+						React.createElement("input", { placeholder: "Your Password", ref: "password", className: "form-control", type: "password" }),
+						React.createElement(
+							"span",
+							{ className: "errors" },
+							this.state.errors.username
+						),
+						React.createElement("br", null)
 					),
 					React.createElement("br", null),
 					React.createElement(
@@ -33447,11 +33474,34 @@ module.exports = React.createClass({
 	},
 	validateExistingUser: function validateExistingUser(event) {
 		event.preventDefault();
-		console.log("yeah, he cool");
+		var that = this;
+		var errors = {};
+		var user = new UserModel();
+
+		var username = this.refs.username.getDOMNode().value;
+		var password = this.refs.password.getDOMNode().value;
+		if (!username || !password) {
+			errors.username = "*Cannot login with blank fields";
+			this.setState({ errors: errors });
+		} else {
+			user.login({
+				username: username,
+				password: password
+			}, {
+				success: function success(userModel) {
+					console.log("user was logged in");
+					that.props.routing.navigate("profile/" + username, { trigger: true });
+				},
+				error: function error(userModel, response) {
+					errors.username = "*Username or password is incorrect";
+					that.setState({ errors: errors });
+				}
+			});
+		}
 	}
 });
 
-},{"../models/UserModel":166,"react":160}],163:[function(require,module,exports){
+},{"../models/UserModel":168,"react":160}],164:[function(require,module,exports){
 "use strict";
 
 var React = require("react");
@@ -33497,13 +33547,37 @@ module.exports = React.createClass({
 	}
 });
 
-},{"react":160}],164:[function(require,module,exports){
+},{"react":160}],165:[function(require,module,exports){
+"use strict";
+
+var React = require("react");
+
+module.exports = React.createClass({
+	displayName: "exports",
+
+	render: function render() {
+		return React.createElement(
+			"div",
+			null,
+			React.createElement(
+				"h2",
+				null,
+				this.props.userLoggedIn,
+				" 's Profile"
+			)
+		);
+	}
+});
+
+},{"react":160}],166:[function(require,module,exports){
 "use strict";
 
 var React = require("react");
 var UserModel = require("../models/UserModel.js");
 var validator = require("validator");
 var _ = require("backbone/node_modules/underscore");
+var UserCollection = require("../collections/UserCollection");
+var userCollection = new UserCollection();
 
 module.exports = React.createClass({
 	displayName: "exports",
@@ -33520,12 +33594,6 @@ module.exports = React.createClass({
 			React.createElement(
 				"div",
 				{ className: "well add-border center-block text-center container small" },
-				React.createElement(
-					"span",
-					{ className: "errors" },
-					this.state.errors.blank
-				),
-				React.createElement("br", null),
 				React.createElement(
 					"form",
 					{ className: "form-horizatonal", onSubmit: this.createNewUser },
@@ -33658,17 +33726,19 @@ module.exports = React.createClass({
 			user.save(null, { error: function error(data, _error) {
 					switch (_error.responseJSON.code) {
 						case 202:
-							errors.username = "*Username is taken";
+							errors.username = _error.responseJSON.error;
 							that.setState({ errors: errors });
 							break;
 						case 203:
-							errors.email = "*Email is already being used";
+							errors.email = _error.responseJSON.error;
 							that.setState({ errors: errors });
 							break;
 					}
 				},
 				success: function success() {
-					that.props.routing.navigate("profile", { trigger: true });
+					userCollection.add(user);
+					console.log(userCollection);
+					that.props.routing.navigate("profile/" + user.get("username"), { trigger: true });
 				}
 			});
 		} else {
@@ -33677,15 +33747,23 @@ module.exports = React.createClass({
 	}
 });
 
-},{"../models/UserModel.js":166,"backbone/node_modules/underscore":2,"react":160,"validator":161}],165:[function(require,module,exports){
+},{"../collections/UserCollection":162,"../models/UserModel.js":168,"backbone/node_modules/underscore":2,"react":160,"validator":161}],167:[function(require,module,exports){
 "use strict";
 
 var React = require("react");
-var Backbone = require("backbone");
-Backbone.$ = require("jquery");
+var Backbone = require("backparse")({
+	appId: "JzJoSsUj4fip0vDgKJSfmSa1aUoDm5JGaTbhHgUD",
+	apiKey: "msnXS15rnVRaH0syEN1ej94ce4YzWM96cFirnafy",
+	apiVersion: 1
+});
+
+var UserCollection = require("./collections/UserCollection");
+var userCollection = new UserCollection();
+
 var LoginIn = require("./components/LoginFormComponent");
 var Register = require("./components/RegisterComponent");
 var NavBar = require("./components/NavBarComponent");
+var ProfilePage = require("./components/ProfilePageComponent");
 
 var containerEl = document.getElementById("container");
 
@@ -33694,14 +33772,15 @@ var App = Backbone.Router.extend({
 		"": "login",
 		"login": "login",
 		"register": "register",
-		"profile": "profile"
+		"profile": "login",
+		"profile/:user": "profile"
 	},
 	login: function login() {
 		React.render(React.createElement(
 			"div",
 			null,
 			React.createElement(NavBar, null),
-			React.createElement(LoginIn, null)
+			React.createElement(LoginIn, { routing: myRoutes })
 		), containerEl);
 	},
 	register: function register() {
@@ -33712,19 +33791,28 @@ var App = Backbone.Router.extend({
 			React.createElement(Register, { routing: myRoutes })
 		), containerEl);
 	},
-	profile: function profile() {
-		React.render(React.createElement(
-			"div",
-			null,
-			"Im a profile!"
-		), containerEl);
+	profile: function profile(user) {
+		console.log(userCollection);
+		//var loggedInUser = userCollection.findWhere({username: user});
+		//console.log(loggedInUser);
+		// if(loggedInUser){
+		React.render(React.createElement(ProfilePage, { routing: myRoutes, userLoggedIn: user }), containerEl);
+		// } else {
+		// 	React.render(
+		// 		<div>
+		// 			<NavBar />
+		// 			<LoginIn routing={myRoutes} />
+		// 		</div>
+		// 		, containerEl
+		// 	);
+		// }
 	}
 });
 
 var myRoutes = new App();
 Backbone.history.start();
 
-},{"./components/LoginFormComponent":162,"./components/NavBarComponent":163,"./components/RegisterComponent":164,"backbone":1,"jquery":5,"react":160}],166:[function(require,module,exports){
+},{"./collections/UserCollection":162,"./components/LoginFormComponent":163,"./components/NavBarComponent":164,"./components/ProfilePageComponent":165,"./components/RegisterComponent":166,"backparse":3,"react":160}],168:[function(require,module,exports){
 "use strict";
 
 var React = require("react");
@@ -33747,7 +33835,7 @@ module.exports = Backbone.Model.extend({
 	isUser: true
 });
 
-},{"backparse":3,"jquery":5,"react":160,"validator":161}]},{},[165])
+},{"backparse":3,"jquery":5,"react":160,"validator":161}]},{},[167])
 
 
 //# sourceMappingURL=all.js.map

@@ -3,7 +3,7 @@ var Backbone = require('backparse')({
     apiKey: 'parserestapikeygoeshere',
     apiVersion: 1
 });
-var Backbone.$ = require("jquery");
+Backbone.$ = require("jquery");
 var UserModel = require("../models/UserModel");
 
 module.exports = Backbone.Collection.extend({

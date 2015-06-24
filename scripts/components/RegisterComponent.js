@@ -2,6 +2,8 @@ var React = require("react");
 var UserModel = require("../models/UserModel.js");
 var validator = require("validator");
 var _ = require("backbone/node_modules/underscore");
+var UserCollection = require("../collections/UserCollection");
+var userCollection = new UserCollection();
 
 module.exports = React.createClass({
 	getInitialState: function(){
@@ -13,7 +15,6 @@ module.exports = React.createClass({
 		return (
 			<div>
 				<div className="well add-border center-block text-center container small">
-					<span className="errors">{this.state.errors.blank}</span><br/>
 					<form className="form-horizatonal" onSubmit={this.createNewUser}>
 						<div className="form-group">
 							<label htmlFor="inputEmail3" className="col-sm-12 control-label">Email</label> 
@@ -89,17 +90,19 @@ module.exports = React.createClass({
 				{error: function(data,error) {
 					switch(error.responseJSON.code){
 						case 202:
-						errors.username = "*Username is taken";
+						errors.username = error.responseJSON.error;
 						that.setState({errors: errors});
 						break;
 						case 203:
-						errors.email = "*Email is already being used";
+						errors.email = error.responseJSON.error;
 						that.setState({errors: errors});
 						break;
 					}
 				},
 				success: function(){
-					that.props.routing.navigate("profile", {trigger: true});
+					userCollection.add(user);
+					console.log(userCollection);
+					that.props.routing.navigate("profile/"+user.get("username"), {trigger: true});
 				}
 			});
 			

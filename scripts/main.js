@@ -1,10 +1,18 @@
 var React = require("react");
-var Backbone = require("backbone");
-Backbone.$ = require("jquery");
+var Backbone = require("backparse")({
+    appId: "JzJoSsUj4fip0vDgKJSfmSa1aUoDm5JGaTbhHgUD",
+    apiKey: "msnXS15rnVRaH0syEN1ej94ce4YzWM96cFirnafy",
+    apiVersion: 1
+});
+
+
+var UserCollection = require("./collections/UserCollection");
+var userCollection = new UserCollection();
+
 var LoginIn = require("./components/LoginFormComponent");
 var Register = require("./components/RegisterComponent");
 var NavBar = require("./components/NavBarComponent");
-
+var ProfilePage = require("./components/ProfilePageComponent");
 
 var containerEl = document.getElementById("container");
 
@@ -13,13 +21,14 @@ var App = Backbone.Router.extend({
 		"":"login",
 		"login": "login",
 		"register":"register",
-		"profile": "profile"
+		"profile": "login",
+		"profile/:user": "profile"
 	},
 	login: function(){
 		React.render(
 			<div>
 				<NavBar />
-				<LoginIn />
+				<LoginIn routing={myRoutes} />
 			</div>
 			, containerEl
 		);
@@ -33,8 +42,22 @@ var App = Backbone.Router.extend({
 			, containerEl
 		);
 	},
-	profile: function(){
-		React.render(<div>Im a profile!</div>, containerEl);
+	profile: function(user){
+		console.log(userCollection);
+		//var loggedInUser = userCollection.findWhere({username: user});
+		//console.log(loggedInUser);
+		// if(loggedInUser){
+			React.render(<ProfilePage routing={myRoutes} userLoggedIn={user}/>, containerEl);
+		// } else {
+		// 	React.render(
+		// 		<div>
+		// 			<NavBar />
+		// 			<LoginIn routing={myRoutes} />
+		// 		</div>
+		// 		, containerEl
+		// 	);
+		// }
+		
 	}
 });
 
