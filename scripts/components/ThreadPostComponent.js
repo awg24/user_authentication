@@ -21,9 +21,10 @@ module.exports = React.createClass({
 	},
 	render: function(){
 		return (
-			<div>
+			<div className="text-center container well">
 				<h1>{this.state.post.get("title")}</h1>
 				<div>{this.state.post.get("body")}</div>
+				<div>{this.state.post.get("category")}</div>
 			</div>
 		);
 	}

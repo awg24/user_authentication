@@ -10,7 +10,8 @@ var validator = require("validator");
 module.exports = Backbone.Model.extend({
 	defaults: {
 		title: null,
-		body: null
+		body: null,
+		category: null
 	},
 	parseClassName: "Thread",
     idAttribute: "objectId"

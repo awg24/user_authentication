@@ -11,13 +11,22 @@ module.exports = React.createClass({
 	},
 	render: function(){
 		return(
-			<div>
+			<div className="text-center">
 				<form onSubmit={this.postThread}>
 					<h2>Post a new thread, {this.props.userLoggedIn}!</h2>
 					Title:<input ref="threadTitle" type="text"/>
 					<span className="errors">{this.state.errors.title}</span><br/>
 					Body:<textarea ref="body"></textarea>
 					<span className="errors">{this.state.errors.body}</span><br/>
+					Category:<select ref="categorySelect">
+								<option value="">--- Chose new Category! ----</option>
+								<option value="thing1">thing1</option>
+								<option value="thing2">thing2</option>
+								<option value="thing3">thing3</option>
+								<option value="thing4">thing4</option>
+								<option value="thing5">thing5</option>
+							</select>
+					<span className="errors">{this.state.errors.category}</span><br/>
 					<button type="submit">Post</button>
 				</form>
 			</div>
@@ -29,7 +38,8 @@ module.exports = React.createClass({
 		var errors = {};
 		var threadModel = new ThreadModel({
 			title: this.refs.threadTitle.getDOMNode().value,
-			body: this.refs.body.getDOMNode().value
+			body: this.refs.body.getDOMNode().value,
+			category: this.refs.categorySelect.getDOMNode().value
 		});
 
 		if(!threadModel.get("title")){
@@ -38,6 +48,10 @@ module.exports = React.createClass({
 		if(!threadModel.get("body")){
 			errors.body = "Body missing!"
 		}
+		if(!threadModel.get("category")){
+			errors.category = "Category missing!"
+		}
+
 
 		if(_.isEmpty(errors)){
 			threadModel.save(null,{

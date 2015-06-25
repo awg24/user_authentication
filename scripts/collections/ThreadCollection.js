@@ -4,9 +4,9 @@ var Backbone = require("backparse")({
     apiVersion: 1
 });
 Backbone.$ = require("jquery");
-var UserModel = require("../models/UserModel");
+var ThreadModel = require("../models/ThreadModel");
 
 module.exports = Backbone.Collection.extend({
-	model: UserModel,
-	parseClassName: "_User"
+	model: ThreadModel,
+	parseClassName: "Thread"
 });

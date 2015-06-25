@@ -33470,22 +33470,157 @@ module.exports = require('./lib/React');
 });
 
 },{}],162:[function(require,module,exports){
-'use strict';
+"use strict";
 
-var Backbone = require('backparse')({
-    appId: 'appidgoeshere',
-    apiKey: 'parserestapikeygoeshere',
+var Backbone = require("backparse")({
+    appId: "JzJoSsUj4fip0vDgKJSfmSa1aUoDm5JGaTbhHgUD",
+    apiKey: "msnXS15rnVRaH0syEN1ej94ce4YzWM96cFirnafy",
     apiVersion: 1
 });
-Backbone.$ = require('jquery');
-var UserModel = require('../models/UserModel');
+Backbone.$ = require("jquery");
+var ThreadModel = require("../models/ThreadModel");
+
+module.exports = Backbone.Collection.extend({
+    model: ThreadModel,
+    parseClassName: "Thread"
+});
+
+},{"../models/ThreadModel":173,"backparse":3,"jquery":5}],163:[function(require,module,exports){
+"use strict";
+
+var Backbone = require("backparse")({
+    appId: "JzJoSsUj4fip0vDgKJSfmSa1aUoDm5JGaTbhHgUD",
+    apiKey: "msnXS15rnVRaH0syEN1ej94ce4YzWM96cFirnafy",
+    apiVersion: 1
+});
+Backbone.$ = require("jquery");
+var UserModel = require("../models/UserModel");
 
 module.exports = Backbone.Collection.extend({
     model: UserModel,
-    parseClassName: '_User'
+    parseClassName: "_User"
 });
 
-},{"../models/UserModel":170,"backparse":3,"jquery":5}],163:[function(require,module,exports){
+},{"../models/UserModel":174,"backparse":3,"jquery":5}],164:[function(require,module,exports){
+"use strict";
+
+var React = require("react");
+
+module.exports = React.createClass({
+	displayName: "exports",
+
+	componentWillMount: function componentWillMount() {
+		var that = this;
+		this.props.threads.fetch({
+			query: {
+				category: this.props.topic
+			},
+			success: function success(data) {
+				that.forceUpdate();
+			}
+		});
+	},
+	render: function render() {
+		var queriedThreads = this.props.threads.map(function (model) {
+			console.log(model);
+			return React.createElement(
+				"div",
+				{ className: "text-center container well", key: model.cid },
+				React.createElement(
+					"h3",
+					null,
+					model.attributes.title
+				),
+				React.createElement(
+					"p",
+					null,
+					model.attributes.body
+				),
+				React.createElement(
+					"p",
+					null,
+					model.attributes.category
+				)
+			);
+		});
+		return React.createElement(
+			"div",
+			{ className: "text-center" },
+			React.createElement(
+				"h1",
+				null,
+				this.props.topic,
+				" Topics!"
+			),
+			queriedThreads
+		);
+	}
+});
+
+},{"react":160}],165:[function(require,module,exports){
+"use strict";
+
+var React = require("react");
+var ThreadCollection = require("../collections/ThreadCollection");
+
+module.exports = React.createClass({
+	displayName: "exports",
+
+	componentWillMount: function componentWillMount() {
+		var that = this;
+		this.props.threads.fetch({
+			success: function success(data) {
+				that.forceUpdate();
+			}
+		});
+	},
+	render: function render() {
+		console.log("from render ", this.props.threads);
+		if (this.props.threads.length !== 0) {
+			var allThreads = this.props.threads.map(function (model) {
+				console.log(model);
+				return React.createElement(
+					"div",
+					{ className: "text-center container well", key: model.cid },
+					React.createElement(
+						"h3",
+						null,
+						model.attributes.title
+					),
+					React.createElement(
+						"p",
+						null,
+						model.attributes.body
+					),
+					React.createElement(
+						"p",
+						null,
+						React.createElement(
+							"a",
+							{ href: "#category/" + model.attributes.category },
+							model.attributes.category
+						)
+					)
+				);
+			});
+		} else {
+			var allThreads = "You have seem to have made a thread yet!";
+		}
+		return React.createElement(
+			"div",
+			null,
+			React.createElement(
+				"h1",
+				{ className: "text-center" },
+				" All Posts "
+			),
+			allThreads
+		);
+	}
+
+});
+
+},{"../collections/ThreadCollection":162,"react":160}],166:[function(require,module,exports){
 "use strict";
 
 var React = require("react");
@@ -33563,7 +33698,7 @@ module.exports = React.createClass({
 			}, {
 				success: function success(userModel) {
 					console.log("user was logged in");
-					that.props.routing.navigate("profile/" + username, { trigger: true });
+					that.props.routing.navigate("home/" + username, { trigger: true });
 				},
 				error: function error(userModel, response) {
 					errors.username = "*Username or password is incorrect";
@@ -33574,7 +33709,7 @@ module.exports = React.createClass({
 	}
 });
 
-},{"../models/UserModel":170,"react":160}],164:[function(require,module,exports){
+},{"../models/UserModel":174,"react":160}],167:[function(require,module,exports){
 'use strict';
 
 var React = require('react');
@@ -33591,8 +33726,19 @@ module.exports = React.createClass({
 	},
 	render: function render() {
 		var link = [];
-		console.log(this.props.user);
+		var search = [];
+		console.log('coming from nav', this.props.routing);
 		if (this.props.user.id) {
+			console.log(this.props.user);
+			link.push(React.createElement(
+				'li',
+				{ key: 5 },
+				React.createElement(
+					'a',
+					{ href: '#home/' + this.props.user.attributes.username },
+					'Home'
+				)
+			));
 			link.push(React.createElement(
 				'li',
 				{ key: 3 },
@@ -33600,6 +33746,29 @@ module.exports = React.createClass({
 					'a',
 					{ onClick: this.logOut, href: '#login' },
 					'Logout'
+				)
+			));
+			link.push(React.createElement(
+				'li',
+				{ key: 4 },
+				React.createElement(
+					'a',
+					{ href: '#postThread/' + this.props.user.attributes.username },
+					'New Thread!'
+				)
+			));
+			search.push(React.createElement(
+				'form',
+				{ key: 6, className: 'navbar-form navbar-left', role: 'search' },
+				React.createElement(
+					'div',
+					{ className: 'form-group' },
+					React.createElement('input', { ref: 'searchQuery', type: 'text', className: 'form-control', placeholder: 'Search' })
+				),
+				React.createElement(
+					'button',
+					{ onClick: this.searchPosts, type: 'submit', className: 'btn btn-default' },
+					'Submit'
 				)
 			));
 		} else {
@@ -33634,18 +33803,27 @@ module.exports = React.createClass({
 					React.createElement(
 						'ul',
 						{ className: 'nav navbar-nav' },
-						link
+						link,
+						search
 					)
 				)
 			)
 		);
 	},
 	logOut: function logOut() {
+		this.props.user.logout();
 		this.props.user.clear();
+	},
+	searchPosts: function searchPosts() {
+		var that = this;
+		var search = this.refs.searchQuery.getDOMNode().value;
+		if (search) {
+			that.props.routing.navigate('search/' + search, { trigger: true });
+		}
 	}
 });
 
-},{"react":160}],165:[function(require,module,exports){
+},{"react":160}],168:[function(require,module,exports){
 "use strict";
 
 var React = require("react");
@@ -33664,7 +33842,7 @@ module.exports = React.createClass({
 	render: function render() {
 		return React.createElement(
 			"div",
-			null,
+			{ className: "text-center" },
 			React.createElement(
 				"form",
 				{ onSubmit: this.postThread },
@@ -33691,6 +33869,47 @@ module.exports = React.createClass({
 					this.state.errors.body
 				),
 				React.createElement("br", null),
+				"Category:",
+				React.createElement(
+					"select",
+					{ ref: "categorySelect" },
+					React.createElement(
+						"option",
+						{ value: "" },
+						"--- Chose new Category! ----"
+					),
+					React.createElement(
+						"option",
+						{ value: "thing1" },
+						"thing1"
+					),
+					React.createElement(
+						"option",
+						{ value: "thing2" },
+						"thing2"
+					),
+					React.createElement(
+						"option",
+						{ value: "thing3" },
+						"thing3"
+					),
+					React.createElement(
+						"option",
+						{ value: "thing4" },
+						"thing4"
+					),
+					React.createElement(
+						"option",
+						{ value: "thing5" },
+						"thing5"
+					)
+				),
+				React.createElement(
+					"span",
+					{ className: "errors" },
+					this.state.errors.category
+				),
+				React.createElement("br", null),
 				React.createElement(
 					"button",
 					{ type: "submit" },
@@ -33705,7 +33924,8 @@ module.exports = React.createClass({
 		var errors = {};
 		var threadModel = new ThreadModel({
 			title: this.refs.threadTitle.getDOMNode().value,
-			body: this.refs.body.getDOMNode().value
+			body: this.refs.body.getDOMNode().value,
+			category: this.refs.categorySelect.getDOMNode().value
 		});
 
 		if (!threadModel.get("title")) {
@@ -33713,6 +33933,9 @@ module.exports = React.createClass({
 		}
 		if (!threadModel.get("body")) {
 			errors.body = "Body missing!";
+		}
+		if (!threadModel.get("category")) {
+			errors.category = "Category missing!";
 		}
 
 		if (_.isEmpty(errors)) {
@@ -33732,7 +33955,7 @@ module.exports = React.createClass({
 	}
 });
 
-},{"../models/ThreadModel":169,"backbone":1,"backbone/node_modules/underscore":2,"react":160}],166:[function(require,module,exports){
+},{"../models/ThreadModel":173,"backbone":1,"backbone/node_modules/underscore":2,"react":160}],169:[function(require,module,exports){
 "use strict";
 
 var React = require("react");
@@ -33910,7 +34133,90 @@ module.exports = React.createClass({
 	}
 });
 
-},{"../collections/UserCollection":162,"../models/UserModel.js":170,"backbone/node_modules/underscore":2,"react":160,"validator":161}],167:[function(require,module,exports){
+},{"../collections/UserCollection":163,"../models/UserModel.js":174,"backbone/node_modules/underscore":2,"react":160,"validator":161}],170:[function(require,module,exports){
+"use strict";
+
+var React = require("react");
+
+module.exports = React.createClass({
+	displayName: "exports",
+
+	componentWillMount: function componentWillMount() {
+		var that = this;
+		this.props.threads.fetch({
+			query: {
+				title: {
+					$regex: ".*" + this.props.query + ".*",
+					$options: "i"
+				}
+			},
+			success: function success(data) {
+				that.forceUpdate();
+				console.log("look here for new data: ", data);
+			}
+		});
+	},
+	render: function render() {
+		console.log("im running");
+		var queriedThreads = this.props.threads.map(function (model) {
+			console.log(model);
+			return React.createElement(
+				"div",
+				{ className: "text-center container well", key: model.cid },
+				React.createElement(
+					"h3",
+					null,
+					model.attributes.title
+				),
+				React.createElement(
+					"p",
+					null,
+					model.attributes.body
+				),
+				React.createElement(
+					"p",
+					null,
+					model.attributes.category
+				)
+			);
+		});
+		return React.createElement(
+			"div",
+			{ className: "text-center" },
+			React.createElement(
+				"h1",
+				null,
+				this.props.query,
+				" search results!"
+			),
+			queriedThreads
+		);
+	},
+	shouldComponentUpdate: function shouldComponentUpdate() {
+		return true;
+	},
+	componentWillUpdate: function componentWillUpdate(nextProps) {
+		console.log("will be updating with ", nextProps);
+	},
+	componentWillReceiveProps: function componentWillReceiveProps(nextProps) {
+		console.log("will receive", nextProps);
+		var that = this;
+		this.props.threads.fetch({
+			query: {
+				title: {
+					$regex: ".*" + nextProps.query + ".*",
+					$options: "i"
+				}
+			},
+			success: function success(data) {
+				that.forceUpdate();
+				console.log("look here for new data: ", data);
+			}
+		});
+	}
+});
+
+},{"react":160}],171:[function(require,module,exports){
 "use strict";
 
 var React = require("react");
@@ -33939,7 +34245,7 @@ module.exports = React.createClass({
 	render: function render() {
 		return React.createElement(
 			"div",
-			null,
+			{ className: "text-center container well" },
 			React.createElement(
 				"h1",
 				null,
@@ -33949,12 +34255,17 @@ module.exports = React.createClass({
 				"div",
 				null,
 				this.state.post.get("body")
+			),
+			React.createElement(
+				"div",
+				null,
+				this.state.post.get("category")
 			)
 		);
 	}
 });
 
-},{"../models/ThreadModel":169,"react":160}],168:[function(require,module,exports){
+},{"../models/ThreadModel":173,"react":160}],172:[function(require,module,exports){
 "use strict";
 
 var React = require("react");
@@ -33967,19 +34278,22 @@ var Backbone = require("backparse")({
 // var UserCollection = require("./collections/UserCollection");
 // var userCollection = new UserCollection();
 var UserModel = require("./models/UserModel");
+var ThreadCollection = require("./collections/ThreadCollection");
 
 var LoginIn = require("./components/LoginFormComponent");
 var Register = require("./components/RegisterComponent");
 var NavBar = require("./components/NavBarComponent");
-var ProfilePage = require("./components/ProfilePageComponent");
+var PostThread = require("./components/PostThreadComponent");
 var ThreadPage = require("./components/ThreadPostComponent");
+var HomePage = require("./components/HomePageComponent");
+var Categories = require("./components/CategoryPageComponent");
+var SearchPage = require("./components/SearchPageResultsComponent");
 
 var containerEl = document.getElementById("container");
 var NavEl = document.getElementById("navigation-element");
 
 var user = new UserModel();
-
-React.render(React.createElement(NavBar, { user: user }), NavEl);
+var threads = new ThreadCollection();
 
 var App = Backbone.Router.extend({
 	routes: {
@@ -33987,64 +34301,94 @@ var App = Backbone.Router.extend({
 		"login": "login",
 		"register": "register",
 		"profile": "login",
-		"profile/:user": "profile",
-		"thread/:threadID": "thread"
+		"postThread/:user": "postThread",
+		"thread/:threadID": "thread",
+		"home/:user": "home",
+		"category/:cate": "category",
+		"search/:query": "search"
 	},
 	login: function login() {
 		React.render(React.createElement(
 			"div",
 			null,
-			React.createElement(LoginIn, { user: user, routing: myRoutes })
+			React.createElement(LoginIn, { user: user, routing: this })
+		), containerEl);
+	},
+	home: function home(user) {
+		React.render(React.createElement(
+			"div",
+			null,
+			React.createElement(HomePage, { user: user, threads: threads, routing: this })
 		), containerEl);
 	},
 	register: function register() {
 		React.render(React.createElement(
 			"div",
 			null,
-			React.createElement(Register, { user: user, routing: myRoutes })
+			React.createElement(Register, { user: user, routing: this })
 		), containerEl);
 	},
-	profile: function profile(user1) {
+	postThread: function postThread(user1) {
 		React.render(React.createElement(
 			"div",
 			null,
-			React.createElement(ProfilePage, { user: user, routing: myRoutes, userLoggedIn: user1 })
+			React.createElement(PostThread, { user: user, routing: this, userLoggedIn: user1 })
 		), containerEl);
 	},
 	thread: function thread(threadID) {
 		React.render(React.createElement(
 			"div",
 			null,
-			React.createElement(ThreadPage, { user: user, threadId: threadID, routing: myRoutes })
+			React.createElement(ThreadPage, { user: user, threadId: threadID, routing: this })
+		), containerEl);
+	},
+	category: function category(cate) {
+		React.render(React.createElement(
+			"div",
+			null,
+			React.createElement(Categories, { topic: cate, threads: threads })
+		), containerEl);
+	},
+	search: function search(query) {
+		React.render(React.createElement(
+			"div",
+			null,
+			React.createElement(SearchPage, { query: query, threads: threads })
 		), containerEl);
 	}
 });
 
 var myRoutes = new App();
+
+React.render(React.createElement(NavBar, { user: user, routing: myRoutes }), NavEl);
+
 Backbone.history.start();
 
-},{"./components/LoginFormComponent":163,"./components/NavBarComponent":164,"./components/ProfilePageComponent":165,"./components/RegisterComponent":166,"./components/ThreadPostComponent":167,"./models/UserModel":170,"backparse":3,"react":160}],169:[function(require,module,exports){
+user.me();
+
+},{"./collections/ThreadCollection":162,"./components/CategoryPageComponent":164,"./components/HomePageComponent":165,"./components/LoginFormComponent":166,"./components/NavBarComponent":167,"./components/PostThreadComponent":168,"./components/RegisterComponent":169,"./components/SearchPageResultsComponent":170,"./components/ThreadPostComponent":171,"./models/UserModel":174,"backparse":3,"react":160}],173:[function(require,module,exports){
 "use strict";
 
 var React = require("react");
 var Backbone = require("backparse")({
-				appId: "JzJoSsUj4fip0vDgKJSfmSa1aUoDm5JGaTbhHgUD",
-				apiKey: "msnXS15rnVRaH0syEN1ej94ce4YzWM96cFirnafy",
-				apiVersion: 1
+	appId: "JzJoSsUj4fip0vDgKJSfmSa1aUoDm5JGaTbhHgUD",
+	apiKey: "msnXS15rnVRaH0syEN1ej94ce4YzWM96cFirnafy",
+	apiVersion: 1
 });
 Backbone.$ = require("jquery");
 var validator = require("validator");
 
 module.exports = Backbone.Model.extend({
-				defaults: {
-								title: null,
-								body: null
-				},
-				parseClassName: "Thread",
-				idAttribute: "objectId"
+	defaults: {
+		title: null,
+		body: null,
+		category: null
+	},
+	parseClassName: "Thread",
+	idAttribute: "objectId"
 });
 
-},{"backparse":3,"jquery":5,"react":160,"validator":161}],170:[function(require,module,exports){
+},{"backparse":3,"jquery":5,"react":160,"validator":161}],174:[function(require,module,exports){
 "use strict";
 
 var React = require("react");
@@ -34067,7 +34411,7 @@ module.exports = Backbone.Model.extend({
 	isUser: true
 });
 
-},{"backparse":3,"jquery":5,"react":160,"validator":161}]},{},[168])
+},{"backparse":3,"jquery":5,"react":160,"validator":161}]},{},[172])
 
 
 //# sourceMappingURL=all.js.map

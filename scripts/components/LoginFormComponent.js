@@ -44,7 +44,7 @@ module.exports = React.createClass({
 			}, {
 			    success: function(userModel) {
 			        console.log('user was logged in');
-			        that.props.routing.navigate("profile/"+username, {trigger: true});
+			        that.props.routing.navigate("home/"+username, {trigger: true});
 			    },
 			    error: function(userModel, response) {
 			        errors.username = "*Username or password is incorrect";
