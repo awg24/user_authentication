@@ -5,17 +5,14 @@ var tempForNav;
 module.exports = React.createClass({
 	componentWillMount: function () {
 		this.props.user.on('change', function() {
-			console.log('user changed nav');
-			console.log(this);
 			this.forceUpdate();
 		}, this);
 	},
 	render: function(){
 		var link = [];
 		var search = [];
-		console.log("coming from nav",this.props.routing);
+
 		if(this.props.user.id){
-			console.log(this.props.user);
 			link.push(<li key={5}><a href={"#home/"+this.props.user.attributes.username}>Home</a></li>);
 			link.push(<li key={3}><a onClick={this.logOut} href="#login">Logout</a></li>);
 			link.push(<li key={4}><a href={"#postThread/"+this.props.user.attributes.username}>New Thread!</a></li>);

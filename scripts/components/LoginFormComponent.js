@@ -43,7 +43,6 @@ module.exports = React.createClass({
 			    password: password
 			}, {
 			    success: function(userModel) {
-			        console.log('user was logged in');
 			        that.props.routing.navigate("home/"+username, {trigger: true});
 			    },
 			    error: function(userModel, response) {

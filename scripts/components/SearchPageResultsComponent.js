@@ -5,8 +5,6 @@ module.exports = React.createClass({
 	componentWillMount: function(){
 		var that = this;
 
-		console.log("query: ",this.props.query, "cateogry searcgh",this.props.categoryToSearch)
-
 		if(this.props.query !== "undefined"){
 			var parseQuery = {title: {
 				$regex: ".*"+this.props.query+".*",
@@ -23,7 +21,6 @@ module.exports = React.createClass({
 			success:function(data){
 				that.setState({title: searchPageTitle});
 				that.forceUpdate();
-				console.log("look here for new data: ",data);
 			}
 		});
 	},
@@ -33,9 +30,7 @@ module.exports = React.createClass({
 		}
 	},
 	render: function(){
-		console.log("im running");
 		var queriedThreads = this.props.threads.map(function(model){
-			console.log(model);
 			return (
 				<div className="text-center container well" key={model.cid}>
 					<h3>{model.attributes.title}</h3>
@@ -59,11 +54,7 @@ module.exports = React.createClass({
 	shouldComponentUpdate: function(){
 		return true;
 	},
-	componentWillUpdate: function(nextProps){
-		console.log("will be updating with ",nextProps);
-	},
 	componentWillReceiveProps: function(nextProps){
-		console.log("will receive", nextProps);
 		var that = this;
 		this.props.threads.fetch({
 			query: {
@@ -75,7 +66,6 @@ module.exports = React.createClass({
 			success:function(data){
 				that.setState({title: nextProps.query});
 				that.forceUpdate();
-				console.log("look here for new data: ",data);
 			}
 		});
 	}	

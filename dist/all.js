@@ -33520,10 +33520,8 @@ module.exports = React.createClass({
 		});
 	},
 	render: function render() {
-		console.log("from render ", this.props.threads);
 		if (this.props.threads.length !== 0) {
 			var allThreads = this.props.threads.map(function (model) {
-				console.log(model);
 				return React.createElement(
 					"div",
 					{ className: "text-center container well", key: model.cid },
@@ -33642,7 +33640,6 @@ module.exports = React.createClass({
 				password: password
 			}, {
 				success: function success(userModel) {
-					console.log("user was logged in");
 					that.props.routing.navigate("home/" + username, { trigger: true });
 				},
 				error: function error(userModel, response) {
@@ -33655,100 +33652,97 @@ module.exports = React.createClass({
 });
 
 },{"../models/UserModel":173,"react":160}],166:[function(require,module,exports){
-'use strict';
+"use strict";
 
-var React = require('react');
+var React = require("react");
 var tempForNav;
 
 module.exports = React.createClass({
-	displayName: 'exports',
+	displayName: "exports",
 
 	componentWillMount: function componentWillMount() {
-		this.props.user.on('change', function () {
-			console.log('user changed nav');
-			console.log(this);
+		this.props.user.on("change", function () {
 			this.forceUpdate();
 		}, this);
 	},
 	render: function render() {
 		var link = [];
 		var search = [];
-		console.log('coming from nav', this.props.routing);
+
 		if (this.props.user.id) {
-			console.log(this.props.user);
 			link.push(React.createElement(
-				'li',
+				"li",
 				{ key: 5 },
 				React.createElement(
-					'a',
-					{ href: '#home/' + this.props.user.attributes.username },
-					'Home'
+					"a",
+					{ href: "#home/" + this.props.user.attributes.username },
+					"Home"
 				)
 			));
 			link.push(React.createElement(
-				'li',
+				"li",
 				{ key: 3 },
 				React.createElement(
-					'a',
-					{ onClick: this.logOut, href: '#login' },
-					'Logout'
+					"a",
+					{ onClick: this.logOut, href: "#login" },
+					"Logout"
 				)
 			));
 			link.push(React.createElement(
-				'li',
+				"li",
 				{ key: 4 },
 				React.createElement(
-					'a',
-					{ href: '#postThread/' + this.props.user.attributes.username },
-					'New Thread!'
+					"a",
+					{ href: "#postThread/" + this.props.user.attributes.username },
+					"New Thread!"
 				)
 			));
 			search.push(React.createElement(
-				'form',
-				{ key: 6, className: 'navbar-form navbar-left', role: 'search' },
+				"form",
+				{ key: 6, className: "navbar-form navbar-left", role: "search" },
 				React.createElement(
-					'div',
-					{ className: 'form-group' },
-					React.createElement('input', { ref: 'searchQuery', type: 'text', className: 'form-control', placeholder: 'Search' })
+					"div",
+					{ className: "form-group" },
+					React.createElement("input", { ref: "searchQuery", type: "text", className: "form-control", placeholder: "Search" })
 				),
 				React.createElement(
-					'button',
-					{ onClick: this.searchPosts, type: 'submit', className: 'btn btn-default' },
-					'Submit'
+					"button",
+					{ onClick: this.searchPosts, type: "submit", className: "btn btn-default" },
+					"Submit"
 				)
 			));
 		} else {
 			link.push(React.createElement(
-				'li',
+				"li",
 				{ key: 1 },
 				React.createElement(
-					'a',
-					{ href: '#login' },
-					'Login'
+					"a",
+					{ href: "#login" },
+					"Login"
 				)
 			));
 			link.push(React.createElement(
-				'li',
+				"li",
 				{ key: 2 },
 				React.createElement(
-					'a',
-					{ href: '#register' },
-					'Resgister'
+					"a",
+					{ href: "#register" },
+					"Resgister"
 				)
 			));
 		}
 		return React.createElement(
-			'nav',
-			{ className: 'navbar add-border navbar-default' },
+			"nav",
+			{ className: "navbar add-border navbar-default" },
 			React.createElement(
-				'div',
-				{ className: 'container-fluid' },
+				"div",
+				{ className: "container-fluid" },
 				React.createElement(
-					'div',
-					{ className: 'collapse navbar-collapse', id: 'bs-example-navbar-collapse-1' },
+					"div",
+					{ className: "collapse navbar-collapse", id: "bs-example-navbar-collapse-1" },
 					React.createElement(
-						'ul',
-						{ className: 'nav navbar-nav' },
+						"ul",
+						{ className: "nav navbar-nav" },
 						link,
 						search
 					)
@@ -33764,7 +33758,7 @@ module.exports = React.createClass({
 		var that = this;
 		var search = this.refs.searchQuery.getDOMNode().value;
 		if (search) {
-			that.props.routing.navigate('search/' + search + '/' + tempForNav, { trigger: true });
+			that.props.routing.navigate("search/" + search + "/" + tempForNav, { trigger: true });
 		}
 	}
 });
@@ -34091,8 +34085,6 @@ module.exports = React.createClass({
 	componentWillMount: function componentWillMount() {
 		var that = this;
 
-		console.log("query: ", this.props.query, "cateogry searcgh", this.props.categoryToSearch);
-
 		if (this.props.query !== "undefined") {
 			var parseQuery = { title: {
 					$regex: ".*" + this.props.query + ".*",
@@ -34109,7 +34101,6 @@ module.exports = React.createClass({
 			success: function success(data) {
 				that.setState({ title: searchPageTitle });
 				that.forceUpdate();
-				console.log("look here for new data: ", data);
 			}
 		});
 	},
@@ -34119,9 +34110,7 @@ module.exports = React.createClass({
 		};
 	},
 	render: function render() {
-		console.log("im running");
 		var queriedThreads = this.props.threads.map(function (model) {
-			console.log(model);
 			return React.createElement(
 				"div",
 				{ className: "text-center container well", key: model.cid },
@@ -34166,11 +34155,7 @@ module.exports = React.createClass({
 	shouldComponentUpdate: function shouldComponentUpdate() {
 		return true;
 	},
-	componentWillUpdate: function componentWillUpdate(nextProps) {
-		console.log("will be updating with ", nextProps);
-	},
 	componentWillReceiveProps: function componentWillReceiveProps(nextProps) {
-		console.log("will receive", nextProps);
 		var that = this;
 		this.props.threads.fetch({
 			query: {
@@ -34182,7 +34167,6 @@ module.exports = React.createClass({
 			success: function success(data) {
 				that.setState({ title: nextProps.query });
 				that.forceUpdate();
-				console.log("look here for new data: ", data);
 			}
 		});
 	}
@@ -34206,7 +34190,6 @@ module.exports = React.createClass({
 		thread.fetch();
 
 		thread.on("change", function (data) {
-			console.log(data);
 			that.forceUpdate();
 		});
 
@@ -34247,8 +34230,6 @@ var Backbone = require("backparse")({
 	apiVersion: 1
 });
 
-// var UserCollection = require("./collections/UserCollection");
-// var userCollection = new UserCollection();
 var UserModel = require("./models/UserModel");
 var ThreadCollection = require("./collections/ThreadCollection");
 
@@ -34314,7 +34295,6 @@ var App = Backbone.Router.extend({
 		), containerEl);
 	},
 	search: function search(query, category) {
-		console.log("category from search:", category);
 		React.render(React.createElement(
 			"div",
 			null,

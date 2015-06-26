@@ -11,7 +11,6 @@ module.exports = React.createClass({
 		thread.fetch();
 
 		thread.on("change", function(data){
-			console.log(data);
 			that.forceUpdate();
 		});
 

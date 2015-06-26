@@ -5,8 +5,6 @@ var Backbone = require("backparse")({
     apiVersion: 1
 });
 
-// var UserCollection = require("./collections/UserCollection");
-// var userCollection = new UserCollection();
 var UserModel = require("./models/UserModel");
 var ThreadCollection = require("./collections/ThreadCollection");
 
@@ -23,8 +21,6 @@ var NavEl = document.getElementById("navigation-element");
 
 var user = new UserModel();
 var threads = new ThreadCollection();
-
-
 
 var App = Backbone.Router.extend({
 	routes: {
@@ -77,7 +73,6 @@ var App = Backbone.Router.extend({
 			, containerEl);
 	},
 	search: function(query, category){
-		console.log("category from search:", category)
 		React.render(
 			<div><SearchPage query={query} categoryToSearch={category} threads={threads} /></div>
 			, containerEl);
@@ -91,8 +86,3 @@ React.render(<NavBar user={user} routing={myRoutes}/>, NavEl);
 Backbone.history.start();
 
 user.me();
-
-
-
-
-
