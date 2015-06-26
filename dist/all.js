@@ -34142,6 +34142,15 @@ module.exports = React.createClass({
 				)
 			);
 		});
+		{
+			if (queriedThreads.length === 0) {
+				queriedThreads = React.createElement(
+					"h2",
+					null,
+					"No results found!"
+				);
+			}
+		}
 		return React.createElement(
 			"div",
 			{ className: "text-center" },

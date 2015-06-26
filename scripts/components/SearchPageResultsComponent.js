@@ -44,6 +44,11 @@ module.exports = React.createClass({
 				</div>
 			);
 		});
+		{
+			if(queriedThreads.length === 0 ){
+				queriedThreads = <h2>No results found!</h2>
+			}
+		}
 		return (
 			<div className="text-center">
 				<h1>{this.state.title} search results!</h1>
