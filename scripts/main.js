@@ -16,7 +16,6 @@ var NavBar = require("./components/NavBarComponent");
 var PostThread = require("./components/PostThreadComponent");
 var ThreadPage = require("./components/ThreadPostComponent");
 var HomePage = require("./components/HomePageComponent");
-var Categories = require("./components/CategoryPageComponent");
 var SearchPage = require("./components/SearchPageResultsComponent");
 
 var containerEl = document.getElementById("container");
@@ -37,7 +36,7 @@ var App = Backbone.Router.extend({
 		"thread/:threadID": "thread",
 		"home/:user":"home",
 		"category/:cate":"category",
-		"search/:query":"search"
+		"search/:query/:cateogry":"search"
 	},
 	login: function(){
 		React.render(
@@ -77,14 +76,10 @@ var App = Backbone.Router.extend({
 			</div>
 			, containerEl);
 	},
-	category: function(cate){
+	search: function(query, category){
+		console.log("category from search:", category)
 		React.render(
-			<div><Categories topic={cate} threads={threads}  /></div>
-			, containerEl);
-	},
-	search: function(query){
-		React.render(
-			<div><SearchPage query={query} threads={threads} /></div>
+			<div><SearchPage query={query} categoryToSearch={category} threads={threads} /></div>
 			, containerEl);
 	}
 });

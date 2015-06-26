@@ -1,20 +1,36 @@
 var React = require("react");
+var searchPageTitle = "";
 
 module.exports = React.createClass({
 	componentWillMount: function(){
 		var that = this;
+
+		console.log("query: ",this.props.query, "cateogry searcgh",this.props.categoryToSearch)
+
+		if(this.props.query !== "undefined"){
+			var parseQuery = {title: {
+				$regex: ".*"+this.props.query+".*",
+				$options: "i"
+			}}
+			searchPageTitle = this.props.query;
+		} else if(this.props.categoryToSearch !== "undefined"){
+			var parseQuery = {category: this.props.categoryToSearch}
+			searchPageTitle = this.props.categoryToSearch;
+		}
+		
 		this.props.threads.fetch({
-			query: {
-				title: {
-					$regex: ".*"+this.props.query+".*",
-					$options: "i"
-				}
-			},
+			query: parseQuery,
 			success:function(data){
+				that.setState({title: searchPageTitle});
 				that.forceUpdate();
 				console.log("look here for new data: ",data);
 			}
 		});
+	},
+	getInitialState: function(){
+		return {
+			title: ""
+		}
 	},
 	render: function(){
 		console.log("im running");
@@ -30,7 +46,7 @@ module.exports = React.createClass({
 		});
 		return (
 			<div className="text-center">
-				<h1>{this.props.query} search results!</h1>
+				<h1>{this.state.title} search results!</h1>
 				{queriedThreads}
 			</div>
 		);
@@ -52,6 +68,7 @@ module.exports = React.createClass({
 				}
 			},
 			success:function(data){
+				that.setState({title: nextProps.query});
 				that.forceUpdate();
 				console.log("look here for new data: ",data);
 			}

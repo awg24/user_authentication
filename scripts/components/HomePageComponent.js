@@ -1,5 +1,6 @@
 var React = require("react");
 var ThreadCollection = require("../collections/ThreadCollection");
+var temp;
 
 
 module.exports = React.createClass({
@@ -19,15 +20,15 @@ module.exports = React.createClass({
 				return <div className="text-center container well" key={model.cid}>
 							<h3>{model.attributes.title}</h3>
 							<p>{model.attributes.body}</p>
-							<p><a href={"#category/"+model.attributes.category}>{model.attributes.category}</a></p>
+							<p><a href={"#search/"+temp+"/"+model.attributes.category}>{model.attributes.category}</a></p>
 						</div>
 			});
 		} else {
 			var allThreads = "You have seem to have made a thread yet!"
 		}
 		return (
-			<div>
-				<h1 className="text-center"> All Posts </h1>
+			<div className="text-center">
+				<h1> All Posts </h1>
 				{allThreads}
 			</div>
 		);

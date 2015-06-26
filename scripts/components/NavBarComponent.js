@@ -1,4 +1,5 @@
 var React = require("react");
+var tempForNav;
 
 
 module.exports = React.createClass({
@@ -50,7 +51,7 @@ module.exports = React.createClass({
 		var that = this;
 		var search = this.refs.searchQuery.getDOMNode().value;
 		if(search){
-			that.props.routing.navigate("search/"+search, {trigger: true});
+			that.props.routing.navigate("search/"+search+"/"+tempForNav, {trigger: true});
 		}
 	}
 });
