@@ -48,45 +48,44 @@ module.exports = React.createClass({
 		var errors = {};
 		var confirm = this.refs.confirmPassword.getDOMNode().value;
 		var newUsername = this.refs.newUsername.getDOMNode().value;
-		var newPassword = this.refs.newEmail.getDOMNode().value;
-		var newEmail = this.refs.newPassword.getDOMNode().value;
+		var newPassword = this.refs.newPassword.getDOMNode().value;
+		var newEmail = this.refs.newEmail.getDOMNode().value;
 
-		var user = new UserModel({
-			username: newUsername,
-			email: newPassword,
-			password: newEmail
-		});
+		this.props.user.set("username", newUsername);
+		this.props.user.set("email", newEmail);
+		this.props.user.set("password", newPassword);
 
-		if(!user.get("username") || !user.get("password") || !user.get("email") || !confirm){
-			if(!user.get("username")){
+
+		if(!newUsername|| !newPassword || !newEmail || !confirm){
+			if(!this.props.user.get("username")){
 				errors.username = "*You must not leave this field blank";
 			}
-			if(!user.get("email")){
+			if(!this.props.user.get("email")){
 				errors.email = "*You must not leave this field blank";
 			}
-			if(!user.get("password")){
+			if(!this.props.user.get("password")){
 				errors.password = "*You must not leave this field blank";
 			}
 			if(!confirm){
 				errors.confirmPassword = "*You must not leave this field blank";
 			}
 		} else {
-			if(!validator.isEmail(user.get("email"))){
+			if(!validator.isEmail(newEmail)){
 				errors.email = "*Must be a valid email";
 			}
-			if(!validator.isAlphanumeric(user.get("username"))){
+			if(!validator.isAlphanumeric(newUsername)){
 				errors.username = "*Username must only contain numbers and letters";
 			}
-			if(confirm !== user.get("password")){
+			if(confirm !== newPassword){
 				errors.confirmPassword = "*Passwords do not match";
-			} else if(user.get("password").length <= 3){
+			} else if(newPassword.length <= 3){
 				errors.passwordLength = "*Password must much longer than 3 characters";
 			}
 		}
 
 		if(_.isEmpty(errors)){
 			var that = this;
-			user.save(null,
+			this.props.user.save(null,
 				{error: function(data,error) {
 					switch(error.responseJSON.code){
 						case 202:
@@ -100,9 +99,19 @@ module.exports = React.createClass({
 					}
 				},
 				success: function(){
-					userCollection.add(user);
-					console.log(userCollection);
-					that.props.routing.navigate("profile/"+user.get("username"), {trigger: true});
+					that.props.user.login({
+					    username: that.props.user.get("username"),
+					    password: that.props.user.get("password")
+					}, {
+					    success: function(userModel) {
+					    	that.forceUpdate();
+					        that.props.routing.navigate("home/"+that.props.user.get("username"), {trigger: true});
+					    },
+					    error: function(userModel, response) {
+					        errors.username = "*Username or password is incorrect";
+					        that.setState({errors: errors})
+					    }
+					});
 				}
 			});
 

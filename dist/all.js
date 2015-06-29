@@ -33505,7 +33505,7 @@ module.exports = Backbone.Collection.extend({
 "use strict";
 
 var React = require("react");
-var ThreadCollection = require("../collections/ThreadCollection");
+var _ = require("backbone/node_modules/underscore");
 var temp;
 
 module.exports = React.createClass({
@@ -33521,7 +33521,14 @@ module.exports = React.createClass({
 	},
 	render: function render() {
 		if (this.props.threads.length !== 0) {
-			var allThreads = this.props.threads.map(function (model) {
+			var limitedList = _.first(this.props.threads.models.reverse(), 10);
+			var sortedLimitedList = _.sortBy(limitedList, function (model) {
+				var date = new Date(model.get("createdAt"));
+				console.log(date);
+				return -1 * date.getTime();
+			});
+			console.log(sortedLimitedList);
+			var allThreads = sortedLimitedList.map(function (model) {
 				return React.createElement(
 					"div",
 					{ className: "text-center container well", key: model.cid },
@@ -33563,7 +33570,7 @@ module.exports = React.createClass({
 
 });
 
-},{"../collections/ThreadCollection":162,"react":160}],165:[function(require,module,exports){
+},{"backbone/node_modules/underscore":2,"react":160}],165:[function(require,module,exports){
 "use strict";
 
 var React = require("react");
@@ -34011,45 +34018,43 @@ module.exports = React.createClass({
 		var errors = {};
 		var confirm = this.refs.confirmPassword.getDOMNode().value;
 		var newUsername = this.refs.newUsername.getDOMNode().value;
-		var newPassword = this.refs.newEmail.getDOMNode().value;
-		var newEmail = this.refs.newPassword.getDOMNode().value;
+		var newPassword = this.refs.newPassword.getDOMNode().value;
+		var newEmail = this.refs.newEmail.getDOMNode().value;
 
-		var user = new UserModel({
-			username: newUsername,
-			email: newPassword,
-			password: newEmail
-		});
+		this.props.user.set("username", newUsername);
+		this.props.user.set("email", newEmail);
+		this.props.user.set("password", newPassword);
 
-		if (!user.get("username") || !user.get("password") || !user.get("email") || !confirm) {
-			if (!user.get("username")) {
+		if (!newUsername || !newPassword || !newEmail || !confirm) {
+			if (!this.props.user.get("username")) {
 				errors.username = "*You must not leave this field blank";
 			}
-			if (!user.get("email")) {
+			if (!this.props.user.get("email")) {
 				errors.email = "*You must not leave this field blank";
 			}
-			if (!user.get("password")) {
+			if (!this.props.user.get("password")) {
 				errors.password = "*You must not leave this field blank";
 			}
 			if (!confirm) {
 				errors.confirmPassword = "*You must not leave this field blank";
 			}
 		} else {
-			if (!validator.isEmail(user.get("email"))) {
+			if (!validator.isEmail(newEmail)) {
 				errors.email = "*Must be a valid email";
 			}
-			if (!validator.isAlphanumeric(user.get("username"))) {
+			if (!validator.isAlphanumeric(newUsername)) {
 				errors.username = "*Username must only contain numbers and letters";
 			}
-			if (confirm !== user.get("password")) {
+			if (confirm !== newPassword) {
 				errors.confirmPassword = "*Passwords do not match";
-			} else if (user.get("password").length <= 3) {
+			} else if (newPassword.length <= 3) {
 				errors.passwordLength = "*Password must much longer than 3 characters";
 			}
 		}
 
 		if (_.isEmpty(errors)) {
 			var that = this;
-			user.save(null, { error: function error(data, _error) {
+			this.props.user.save(null, { error: function error(data, _error) {
 					switch (_error.responseJSON.code) {
 						case 202:
 							errors.username = _error.responseJSON.error;
@@ -34062,9 +34067,19 @@ module.exports = React.createClass({
 					}
 				},
 				success: function success() {
-					userCollection.add(user);
-					console.log(userCollection);
-					that.props.routing.navigate("profile/" + user.get("username"), { trigger: true });
+					that.props.user.login({
+						username: that.props.user.get("username"),
+						password: that.props.user.get("password")
+					}, {
+						success: function success(userModel) {
+							that.forceUpdate();
+							that.props.routing.navigate("home/" + that.props.user.get("username"), { trigger: true });
+						},
+						error: function error(userModel, response) {
+							errors.username = "*Username or password is incorrect";
+							that.setState({ errors: errors });
+						}
+					});
 				}
 			});
 		} else {
@@ -34078,6 +34093,7 @@ module.exports = React.createClass({
 
 var React = require("react");
 var searchPageTitle = "";
+var _ = require("backbone/node_modules/underscore");
 
 module.exports = React.createClass({
 	displayName: "exports",
@@ -34100,7 +34116,6 @@ module.exports = React.createClass({
 			query: parseQuery,
 			success: function success(data) {
 				that.setState({ title: searchPageTitle });
-				that.forceUpdate();
 			}
 		});
 	},
@@ -34110,7 +34125,14 @@ module.exports = React.createClass({
 		};
 	},
 	render: function render() {
-		var queriedThreads = this.props.threads.map(function (model) {
+		console.log("should be reversed", this.props.threads.models.reverse());
+
+		var limitedList = _.first(this.props.threads.models, 10);
+		var sortedLimitedList = _.sortBy(limitedList, function (model) {
+			var date = new Date(model.get("createdAt"));
+			return -1 * date.getTime();
+		});
+		var queriedThreads = sortedLimitedList.map(function (model) {
 			return React.createElement(
 				"div",
 				{ className: "text-center container well", key: model.cid },
@@ -34172,7 +34194,7 @@ module.exports = React.createClass({
 	}
 });
 
-},{"react":160}],170:[function(require,module,exports){
+},{"backbone/node_modules/underscore":2,"react":160}],170:[function(require,module,exports){
 "use strict";
 
 var React = require("react");
@@ -34327,7 +34349,8 @@ module.exports = Backbone.Model.extend({
 	defaults: {
 		title: null,
 		body: null,
-		category: null
+		category: null,
+		createdToSort: null
 	},
 	parseClassName: "Thread",
 	idAttribute: "objectId"

@@ -1,5 +1,6 @@
 var React = require("react");
 var searchPageTitle = "";
+var _ = require("backbone/node_modules/underscore");
 
 module.exports = React.createClass({
 	componentWillMount: function(){
@@ -20,7 +21,6 @@ module.exports = React.createClass({
 			query: parseQuery,
 			success:function(data){
 				that.setState({title: searchPageTitle});
-				that.forceUpdate();
 			}
 		});
 	},
@@ -29,8 +29,15 @@ module.exports = React.createClass({
 			title: ""
 		}
 	},
-	render: function(){
-		var queriedThreads = this.props.threads.map(function(model){
+	render: function(){	
+		console.log("should be reversed", this.props.threads.models.reverse());
+
+		var limitedList = _.first(this.props.threads.models, 10);
+			var sortedLimitedList = _.sortBy(limitedList,function(model){
+				var date = new Date(model.get("createdAt"));
+				return -1*date.getTime();
+			});
+		var queriedThreads = sortedLimitedList.map(function(model){
 			return (
 				<div className="text-center container well" key={model.cid}>
 					<h3>{model.attributes.title}</h3>

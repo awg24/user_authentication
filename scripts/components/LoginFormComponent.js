@@ -50,6 +50,6 @@ module.exports = React.createClass({
 			        that.setState({errors: errors})
 			    }
 			})
-				}
 		}
+	}
 });

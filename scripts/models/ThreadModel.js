@@ -11,7 +11,8 @@ module.exports = Backbone.Model.extend({
 	defaults: {
 		title: null,
 		body: null,
-		category: null
+		category: null,
+		createdToSort: null
 	},
 	parseClassName: "Thread",
     idAttribute: "objectId"

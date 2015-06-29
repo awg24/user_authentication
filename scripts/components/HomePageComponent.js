@@ -1,7 +1,6 @@
 var React = require("react");
-var ThreadCollection = require("../collections/ThreadCollection");
+var _ = require("backbone/node_modules/underscore");
 var temp;
-
 
 module.exports = React.createClass({
 	componentWillMount: function(){
@@ -14,7 +13,14 @@ module.exports = React.createClass({
 	},
 	render: function(){
 		if(this.props.threads.length !== 0){
-			var allThreads = this.props.threads.map(function(model){
+			var limitedList = _.first(this.props.threads.models.reverse(), 10);
+			var sortedLimitedList = _.sortBy(limitedList,function(model){
+				var date = new Date(model.get("createdAt"));
+				console.log(date);
+				return -1*date.getTime();
+			});
+			console.log(sortedLimitedList);
+			var allThreads = sortedLimitedList.map(function(model){
 				return <div className="text-center container well" key={model.cid}>
 							<h3>{model.attributes.title}</h3>
 							<p>{model.attributes.body}</p>
